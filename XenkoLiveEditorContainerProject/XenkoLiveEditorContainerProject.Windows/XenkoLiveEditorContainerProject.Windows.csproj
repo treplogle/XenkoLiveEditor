@@ -15,6 +15,7 @@
     <SiliconStudioPackageGuid>{5523f72a-4e82-42d8-aa47-602bffccd8dc}</SiliconStudioPackageGuid>
     <!-- Force msbuild to check to rebuild this assembly instead of letting VS IDE guess -->
     <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup>
     <SiliconStudioCurrentPackagePath>$(MSBuildThisFileDirectory)..\XenkoLiveEditorContainerProject.xkpkg</SiliconStudioCurrentPackagePath>
