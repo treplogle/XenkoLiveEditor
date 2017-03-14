@@ -1,5 +1,6 @@
 ﻿<base:BaseEditor x:Class="XenkoLiveEditor.DataTypeEditors.SingleEditor"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -12,6 +13,6 @@
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <TextBlock x:Name="PropertyName" Text="" Grid.Column="0" VerticalAlignment="Center" />
-        <TextBox x:Name="Value" Text="" Grid.Column="1" />
+        <Controls:NumericUpDown x:Name="Value" Grid.Column="1" HasDecimals="True" Speedup="True" Interval="0.1" />
     </Grid>
 </base:BaseEditor>

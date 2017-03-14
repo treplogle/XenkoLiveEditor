@@ -12,28 +12,21 @@ namespace XenkoLiveEditor.DataTypeEditors
             
             PropertyName.Text = property.Name;
             UpdateValues(false);
-
-            Value.LostFocus += OnValueChanged;
-            AddTextBoxEvents(Value);
+            
+            AddNumericBoxEvents(OnValueChanged, Value);
         }
-
-        private void OnValueChanged(object sender, System.Windows.RoutedEventArgs e)
+        
+        private void OnValueChanged()
         {
-            float value = 0;
-            float.TryParse(Value.Text, out value);
-
-            Value.Text = value.ToString();
-
-            ComponentProperty.SetValue(Component, value);
+            ComponentProperty.SetValue(Component, GetFloat(Value.Value));
         }
         
         public override void UpdateValues(bool editorWindowIsActive)
         {
             var value = (float)ComponentProperty.GetValue(Component);
-            var stringVal = value.ToString();
 
-            if ((!editorWindowIsActive || !Value.IsFocused) && Value.Text != stringVal)
-                Value.Text = value.ToString();
+            if ((!editorWindowIsActive || !Value.IsFocused) && GetFloat(Value.Value) != value)
+                Value.Value = value;
         }
     }
 }

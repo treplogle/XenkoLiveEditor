@@ -15,25 +15,12 @@ namespace XenkoLiveEditor.DataTypeEditors
             PropertyName.Text = property.Name;
             UpdateValues(false);
 
-            X.LostFocus += OnValueChanged;
-            Y.LostFocus += OnValueChanged;
-            Z.LostFocus += OnValueChanged;
-
-            AddTextBoxEvents(X, Y, Z);
+            AddNumericBoxEvents(OnValueChanged, X, Y, Z);
         }
 
-        private void OnValueChanged(object sender, System.Windows.RoutedEventArgs e)
+        private void OnValueChanged()
         {
-            float x = 0, y = 0, z = 0;
-            float.TryParse(X.Text, out x);
-            float.TryParse(Y.Text, out y);
-            float.TryParse(Z.Text, out z);
-
-            X.Text = x.ToString();
-            Y.Text = y.ToString();
-            Z.Text = z.ToString();
-
-            var v = new Vector3(x, y, z);
+            var v = new Vector3(GetFloat(X.Value), GetFloat(Y.Value), GetFloat(Z.Value));
             var q = GetQuaternionRotation(v);
 
             ComponentProperty.SetValue(Component, q);
@@ -42,18 +29,14 @@ namespace XenkoLiveEditor.DataTypeEditors
         public override void UpdateValues(bool editorWindowIsActive)
         {
             var quaternion = (Quaternion)ComponentProperty.GetValue(Component);
-            var rotation = GetEulerRotation(quaternion);
-
-            var xStr = rotation.X.ToString();
-            var yStr = rotation.Y.ToString();
-            var zStr = rotation.Z.ToString();
-
-            if ((!editorWindowIsActive || !X.IsFocused) && X.Text != xStr)
-                X.Text = xStr;
-            if ((!editorWindowIsActive || !Y.IsFocused) && Y.Text != yStr)
-                Y.Text = yStr;
-            if ((!editorWindowIsActive || !Z.IsFocused) && Z.Text != zStr)
-                Z.Text = zStr;
+            var value = GetEulerRotation(quaternion);
+            
+            if ((!editorWindowIsActive || !X.IsFocused) && GetFloat(X.Value) != value.X)
+                X.Value = value.X;
+            if ((!editorWindowIsActive || !Y.IsFocused) && GetFloat(Y.Value) != value.Y)
+                Y.Value = value.Y;
+            if ((!editorWindowIsActive || !Z.IsFocused) && GetFloat(Z.Value) != value.Z)
+                Z.Value = value.Z;
         }
         
         private Vector3 GetEulerRotation(Quaternion rotation)

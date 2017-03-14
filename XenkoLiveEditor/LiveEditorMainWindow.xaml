@@ -1,11 +1,28 @@
-﻿<Window x:Class="XenkoLiveEditor.LiveEditorMainWindow"
+﻿<Controls:MetroWindow x:Class="XenkoLiveEditor.LiveEditorMainWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:XenkoLiveEditor"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Width="800" Height="800">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <!-- Accent and AppTheme setting -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="TextBlockText" TargetType="{x:Type TextBlock}">
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid x:Name="RootGrid">
         <Label Name="label" Content="Entities" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <TreeView x:Name="entityTreeView" Margin="10,41,0,149" ItemsSource="{Binding Entities}" HorizontalAlignment="Left" Width="250" SelectedItemChanged="entityTreeView_SelectedItemChanged">
@@ -32,4 +49,4 @@
             <TextBlock Name="txtLog" TextWrapping="Wrap" Text="" />
         </ScrollViewer>
     </Grid>
-</Window>
+</Controls:MetroWindow>

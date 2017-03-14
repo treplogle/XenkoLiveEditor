@@ -14,36 +14,23 @@ namespace XenkoLiveEditor.DataTypeEditors
             PropertyName.Text = property.Name;
             UpdateValues(false);
 
-            X.LostFocus += OnValueChanged;
-            Y.LostFocus += OnValueChanged;
-
-            AddTextBoxEvents(X, Y);
+            AddNumericBoxEvents(OnValueChanged, X, Y);
         }
 
-        private void OnValueChanged(object sender, System.Windows.RoutedEventArgs e)
+        private void OnValueChanged()
         {
-            float x = 0, y = 0;
-            float.TryParse(X.Text, out x);
-            float.TryParse(Y.Text, out y);
-
-            X.Text = x.ToString();
-            Y.Text = y.ToString();
-
-            var v = new Vector2(x, y);
+            var v = new Vector2(GetFloat(X.Value), GetFloat(Y.Value));
             ComponentProperty.SetValue(Component, v);
         }
         
         public override void UpdateValues(bool editorWindowIsActive)
         {
             var value = (Vector2)ComponentProperty.GetValue(Component);
-
-            var xStr = value.X.ToString();
-            var yStr = value.Y.ToString();
-
-            if ((!editorWindowIsActive || !X.IsFocused) && X.Text != xStr)
-                X.Text = xStr;
-            if ((!editorWindowIsActive || !Y.IsFocused) && Y.Text != yStr)
-                Y.Text = yStr;
+            
+            if ((!editorWindowIsActive || !X.IsFocused) && GetFloat(X.Value) != value.X)
+                X.Value = value.X;
+            if ((!editorWindowIsActive || !Y.IsFocused) && GetFloat(Y.Value) != value.Y)
+                Y.Value = value.Y;
         }
     }
 }

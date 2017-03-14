@@ -1,4 +1,5 @@
-﻿using SiliconStudio.Xenko.Engine;
+﻿using MahApps.Metro.Controls;
+using SiliconStudio.Xenko.Engine;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +12,7 @@ using System.Windows.Media;
 
 namespace XenkoLiveEditor
 {
-    public partial class LiveEditorMainWindow : Window
+    public partial class LiveEditorMainWindow : MetroWindow
     {
         private Game game;
         private SceneInstance sceneInstance;
