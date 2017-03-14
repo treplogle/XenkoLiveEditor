@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E8B8FC87-95CB-41CC-91E1-6EBF964A0B7E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>XenkoLiveEditor</RootNamespace>
+    <AssemblyName>XenkoLiveEditor</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="SiliconStudio.Core">
+      <HintPath>..\..\..\..\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.10.0-beta\Bin\Windows-Direct3D11\SiliconStudio.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Core.Mathematics">
+      <HintPath>..\..\..\..\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.10.0-beta\Bin\Windows-Direct3D11\SiliconStudio.Core.Mathematics.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Xenko">
+      <HintPath>..\..\..\..\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.10.0-beta\Bin\Windows-Direct3D11\SiliconStudio.Xenko.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Xenko.Engine">
+      <HintPath>..\..\..\..\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.10.0-beta\Bin\Windows-Direct3D11\SiliconStudio.Xenko.Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Xenko.Games">
+      <HintPath>..\..\..\..\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.10.0-beta\Bin\Windows-Direct3D11\SiliconStudio.Xenko.Games.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Xenko.Particles">
+      <HintPath>..\..\..\..\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.10.0-beta\Bin\Windows-Direct3D11\SiliconStudio.Xenko.Particles.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Xenko.Physics">
+      <HintPath>..\..\..\..\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.10.0-beta\Bin\Windows-Direct3D11\SiliconStudio.Xenko.Physics.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Xenko.Shaders">
+      <HintPath>..\..\..\..\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.10.0-beta\Bin\Windows-Direct3D11\SiliconStudio.Xenko.Shaders.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Xenko.Shaders.Compiler">
+      <HintPath>..\..\..\..\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.10.0-beta\Bin\Windows-Direct3D11\SiliconStudio.Xenko.Shaders.Compiler.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Xenko.UI">
+      <HintPath>..\..\..\..\Program Files\Silicon Studio\Xenko\GamePackages\Xenko.1.10.0-beta\Bin\Windows-Direct3D11\SiliconStudio.Xenko.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Presentation" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ComponentPropertyItem.cs" />
+    <Compile Include="DataTypeEditors\BaseEditor.cs" />
+    <Compile Include="DataTypeEditors\BooleanEditor.xaml.cs">
+      <DependentUpon>BooleanEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataTypeEditors\EnumEditor.xaml.cs">
+      <DependentUpon>EnumEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataTypeEditors\Int32Editor.xaml.cs">
+      <DependentUpon>Int32Editor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataTypeEditors\QuaternionEditor.xaml.cs">
+      <DependentUpon>QuaternionEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataTypeEditors\RotationEditor.xaml.cs">
+      <DependentUpon>RotationEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataTypeEditors\SingleEditor.xaml.cs">
+      <DependentUpon>SingleEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataTypeEditors\UnsupportedEditor.xaml.cs">
+      <DependentUpon>UnsupportedEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataTypeEditors\Vector2Editor.xaml.cs">
+      <DependentUpon>Vector2Editor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataTypeEditors\Vector3Editor.xaml.cs">
+      <DependentUpon>Vector3Editor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EntityComponentExpander.xaml.cs">
+      <DependentUpon>EntityComponentExpander.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EntityComponentInfo.cs" />
+    <Compile Include="EntityTreeItem.cs" />
+    <Compile Include="LogLevel.cs" />
+    <Compile Include="LiveEditorMainWindow.xaml.cs">
+      <DependentUpon>LiveEditorMainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="DataTypeEditors\BooleanEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataTypeEditors\EnumEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataTypeEditors\Int32Editor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataTypeEditors\QuaternionEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataTypeEditors\RotationEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataTypeEditors\SingleEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataTypeEditors\UnsupportedEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataTypeEditors\Vector2Editor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataTypeEditors\Vector3Editor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EntityComponentExpander.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LiveEditorMainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
