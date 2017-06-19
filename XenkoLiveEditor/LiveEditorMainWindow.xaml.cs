@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+
 
 namespace XenkoLiveEditor
 {
@@ -16,12 +18,16 @@ namespace XenkoLiveEditor
     {
         private Game game;
         private SceneInstance sceneInstance;
-        
+
         public ObservableCollection<EntityTreeItem> Entities { get; set; } = new ObservableCollection<EntityTreeItem>();
-        
+
+        //Scenes stored in a seperate container to save tree traversal
+        //TODO: Maybe factor this out
+        public ObservableCollection<SceneItem> Scenes { get; set; } = new ObservableCollection<SceneItem>();
+
         private EntityTreeItem selectedEntity;
         private Dictionary<Type, EntityComponentInfo> componentInfos = new Dictionary<Type, EntityComponentInfo>();
-        
+
         private bool componentsInitialized = false;
 
         public LiveEditorMainWindow(Game game)
@@ -32,7 +38,7 @@ namespace XenkoLiveEditor
             InitializeComponent();
 
             RootGrid.DataContext = this;
-            
+
             this.game = game;
 
             Task.Factory.StartNew(GetSceneInstance);
@@ -40,7 +46,7 @@ namespace XenkoLiveEditor
 
             Closing += MainWindow_Closing;
         }
-        
+
         #region Setup Xenko Bindings
 
         private async void GetSceneInstance()
@@ -101,7 +107,7 @@ namespace XenkoLiveEditor
         {
             OnEntityRemoved(e);
         }
-        
+
         private void SceneInstance_SceneChanged(object sender, EventArgs e)
         {
             Log("Scene changed");
@@ -120,10 +126,12 @@ namespace XenkoLiveEditor
 
         private void AddSceneInstanceEvents()
         {
-            sceneInstance.SceneChanged += SceneInstance_SceneChanged;
+            sceneInstance.RootSceneChanged += SceneInstance_SceneChanged;
             sceneInstance.EntityAdded += SceneInstance_EntityAdded;
             sceneInstance.EntityRemoved += SceneInstance_EntityRemoved;
             sceneInstance.ComponentChanged += SceneInstance_ComponentChanged;
+            sceneInstance.RootScene.Children.CollectionChanged += Children_CollectionChanged;
+
         }
 
         private void RemoveSceneInstanceEvents()
@@ -131,12 +139,74 @@ namespace XenkoLiveEditor
             if (sceneInstance == null)
                 return;
 
-            sceneInstance.SceneChanged -= SceneInstance_SceneChanged;
+            sceneInstance.RootSceneChanged -= SceneInstance_SceneChanged;
             sceneInstance.EntityAdded -= SceneInstance_EntityAdded;
             sceneInstance.EntityRemoved -= SceneInstance_EntityRemoved;
             sceneInstance.ComponentChanged -= SceneInstance_ComponentChanged;
+            sceneInstance.RootScene.Children.CollectionChanged -= Children_CollectionChanged;
+
         }
-        
+
+        private void Children_CollectionChanged(object sender, SiliconStudio.Core.Collections.TrackingCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    Scene scene = (Scene)e.Item;
+                    Scene parentScene = scene.Parent;
+
+                    if (parentScene != null)
+                    {
+                        SceneItem parentInTree = FindSceneInTree(Scenes, parentScene);
+                        if (parentInTree != null)
+                        {
+                            //Add in the scene into the tree
+                            EntityTreeItem newSceneInTree = new EntityTreeItem(scene);
+                            Scenes.Add(new SceneItem(newSceneInTree));
+                            parentInTree.Entities.Add(newSceneInTree);
+
+                            foreach (var entity in scene.Entities)
+                            {
+                                OnEntityAdded(entity);
+                            }
+
+                            //In the unlikely event that additional child scenes have been added before XLE
+                            //pickup up the event, loop recruisevly
+                            foreach (var s in scene.Children)
+                            {
+                                Children_CollectionChanged(null,
+                                    new SiliconStudio.Core.Collections.TrackingCollectionChangedEventArgs(
+                                    System.Collections.Specialized.NotifyCollectionChangedAction.Add, s, null, 0, false)
+                                    );
+                            }
+                        }
+                    }
+
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    //Trigger a rebuild of the tree
+                    //Bit of task trickery here as the this even fires well before actual unloading
+                    var t = Task.Factory.StartNew(() =>
+                    {
+                        Task.Delay(200).Wait(); //TODO: 200 is totally a magic number here
+                        BuildTree();
+                    },
+                        CancellationToken.None,
+                        TaskCreationOptions.None,
+                        TaskScheduler.FromCurrentSynchronizationContext()
+                    );
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                    break;
+                default:
+                    break;
+            }
+        }
+
         #endregion Xenko Event Handlers
 
         #region UI Events
@@ -164,14 +234,18 @@ namespace XenkoLiveEditor
             // Build component view and add components changed event handling.
             // Spin up watcher thread to watch for component value changes.
 
-            foreach (var component in entity.Entity.Components)
+            if (entity.Entity.GetType() == typeof(Entity))
             {
-                OnComponentAdded(component);
+                Entity actualEntity = (Entity)entity.Entity;
+                foreach (var component in actualEntity.Components)
+                {
+                    OnComponentAdded(component);
+                }
             }
 
             componentsInitialized = true;
         }
-        
+
         #endregion UI Events
 
         #region UI Updates
@@ -179,30 +253,20 @@ namespace XenkoLiveEditor
         private void OnSceneInstanceReady()
         {
             AddSceneInstanceEvents();
-            
-            foreach (var entity in sceneInstance.Scene.Entities)
-            {
-                OnEntityAdded(entity);
-            }
+
+            BuildTree();
+
         }
-        
+
         private void OnEntityAdded(Entity entity)
         {
             Log($"Entity {entity.Name} added.");
 
-            var treeItem = new EntityTreeItem(entity);
+            SceneItem sceneUpdated = FindSceneInTree(Scenes, entity.Scene);
 
-            if (entity.Transform.Parent != null)
+            if (sceneUpdated != null)
             {
-                var result = FindEntityInTree(Entities, entity.Transform.Parent.Entity);
-                if (result == null)
-                    Entities.Add(treeItem);
-                else
-                    result.Children.Add(treeItem);
-            }
-            else
-            {
-                Entities.Add(treeItem);
+                sceneUpdated.OnEntityAdded(entity);
             }
         }
 
@@ -210,10 +274,12 @@ namespace XenkoLiveEditor
         {
             Log($"Entity {entity.Name} removed.");
 
-            var result = FindEntityInTree(Entities, entity);
+            SceneItem sceneUpdated = FindSceneInTree(Scenes, entity.Scene);
 
-            if (result != null)
-                Entities.Remove(result);
+            if (sceneUpdated != null)
+            {
+                sceneUpdated.OnEntityRemoved(entity);
+            }
         }
 
         private void OnComponentAdded(EntityComponent component)
@@ -222,20 +288,20 @@ namespace XenkoLiveEditor
             expander.Root.IsExpanded = true;
 
             var componentInfo = GetEntityComponentInfo(component.GetType());
-            
+
             expander.Root.Header = componentInfo.Name;
 
             var propertyEditors = new List<UserControl>();
-            
+
             foreach (var prop in componentInfo.Properties)
             {
                 if (prop.Name == "Id")
                     continue;
-                
+
                 var elem = GetEditorForProperty(component, prop);
                 expander.ComponentList.Children.Add(elem);
             }
-            
+
             componentGridList.Children.Add(expander);
         }
 
@@ -245,13 +311,17 @@ namespace XenkoLiveEditor
             if (listItem != null)
                 componentGridList.Children.Remove(listItem);
         }
-        
+
         private void ClearComponentView()
         {
             componentGridList.Children.Clear();
             componentsInitialized = false;
         }
-        
+
+        #endregion UI Updates
+
+        #region Methods
+
         private void Log(string message)
         {
             Log(LogLevel.Info, message);
@@ -289,9 +359,35 @@ namespace XenkoLiveEditor
             });
         }
 
-        #endregion UI Updates
+        public void BuildTree()
+        {
+            Entities.Clear();
+            Scenes.Clear();
 
-        #region Methods
+            //Add in the root scene
+            EntityTreeItem treeRoot = new EntityTreeItem(sceneInstance.RootScene);
+            Scenes.Add(new SceneItem(treeRoot));
+            Entities.Add(treeRoot);
+
+            //Loop through any children
+            foreach (var s in sceneInstance.RootScene.Children)
+            {
+                Children_CollectionChanged(null,
+                    new SiliconStudio.Core.Collections.TrackingCollectionChangedEventArgs(
+                    System.Collections.Specialized.NotifyCollectionChangedAction.Add, s, null, 0, false)
+                    );
+            }
+
+            //Then add the entities of the root scene
+            foreach (var entity in sceneInstance.RootScene.Entities)
+            {
+                OnEntityAdded(entity);
+            }
+
+            //Expand the root of the tree to open it
+            //TODO: Work out how the hell to do this
+
+        }
 
         private async void UpdateComponentValuesTicker()
         {
@@ -316,6 +412,18 @@ namespace XenkoLiveEditor
                         ((DataTypeEditors.BaseEditor)element).UpdateValues(IsActive);
                 }
             }
+        }
+
+
+
+        public SceneItem FindSceneInTree(IEnumerable<SceneItem> collection, Scene scene)
+        {
+            foreach (var s in collection)
+            {
+                if (s.scene == scene)
+                    return s;
+            }
+            return null;
         }
 
         private UserControl GetEditorForProperty(EntityComponent component, ComponentPropertyItem property)
@@ -345,21 +453,7 @@ namespace XenkoLiveEditor
                 return new DataTypeEditors.UnsupportedEditor(component, property);
         }
 
-        private EntityTreeItem FindEntityInTree(IEnumerable<EntityTreeItem> collection, Entity entity)
-        {
-            foreach (var e in collection)
-            {
-                if (e.Entity == entity)
-                    return e;
 
-                var result = FindEntityInTree(e.Children, entity);
-
-                if (result != null)
-                    return result;
-            }
-
-            return null;
-        }
 
         private EntityComponentInfo GetEntityComponentInfo(Type type)
         {
@@ -371,6 +465,7 @@ namespace XenkoLiveEditor
 
             return info;
         }
+
 
         #endregion Methods
     }
