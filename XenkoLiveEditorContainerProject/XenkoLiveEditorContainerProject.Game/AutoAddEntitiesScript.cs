@@ -24,12 +24,12 @@ namespace XenkoLiveEditorContainerProject
                     Entity.Add(testScript);
                 }
 
-                double chance = 1.0 / SceneSystem.SceneInstance.Scene.Entities.Sum(e => CountEntity(e));
-                var randomEntity = GetRandomEntity(rand, chance, SceneSystem.SceneInstance.Scene.Entities);
+                double chance = 1.0 / SceneSystem.SceneInstance.RootScene.Entities.Sum(e => CountEntity(e));
+                var randomEntity = GetRandomEntity(rand, chance, SceneSystem.SceneInstance.RootScene.Entities);
 
                 if (rand.NextDouble() < 0)
                 {
-                    SceneSystem.SceneInstance.Scene.Entities.Remove(randomEntity);
+                    SceneSystem.SceneInstance.RootScene.Entities.Remove(randomEntity);
                 }
                 else
                 {
@@ -38,7 +38,7 @@ namespace XenkoLiveEditorContainerProject
                     if (randomEntity != null)
                         randomEntity.Transform.Children.Add(entity.Transform);
                     else
-                        SceneSystem.SceneInstance.Scene.Entities.Add(entity);
+                        SceneSystem.SceneInstance.RootScene.Entities.Add(entity);
                 }
 
                 await Task.Delay(2000);
